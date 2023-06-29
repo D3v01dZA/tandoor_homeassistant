@@ -1,0 +1,5 @@
+# Home Assistant Working Directory
+config
+
+# Python Cache
+__pycache__

@@ -1,0 +1,17 @@
+{
+    "domain": "tandoor",
+    "name": "Tandoor",
+    "config_flow": true,
+    "documentation": "https://github.com/D3v01dZA/tandoor_homeassistant",
+    "requirements": [],
+    "ssdp": [],
+    "zeroconf": [],
+    "homekit": {},
+    "dependencies": [],
+    "codeowners": [
+      "@D3v01dZA"
+    ],
+    "version" : "0.0.1",
+    "iot_class": "local_polling"
+  }
+  

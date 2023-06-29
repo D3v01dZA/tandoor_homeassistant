@@ -1,0 +1,9 @@
+add_shopping_list_item:
+  name: Add Shopping List Item
+  description: Adds a shopping list item to the shopping list
+  fields:
+    item:
+      name: Item
+      description: The item to add
+      required: true
+      example: Milk
