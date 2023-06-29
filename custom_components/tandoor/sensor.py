@@ -59,11 +59,15 @@ class ShoppingList(Entity):
         return attr
     
     async def async_update(self):
+        def ordering(item):
+            return item["food"]["name"].lower()
+
         _LOGGER.debug(f"Updating shopping list {self._url}")
         async with aiohttp.ClientSession() as session:
             async with session.get(f"{self._url}/api/shopping-list-entry/?checked=false", headers=headers(self._key)) as response:
                 _LOGGER.debug(f"Shopping list response {response}")
                 items = await response.json()
                 _LOGGER.debug(f"Shopping list response JSON {items}")
+                items.sort(key=ordering)
                 self._items = items
         await session.close()
