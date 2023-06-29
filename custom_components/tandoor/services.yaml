@@ -7,3 +7,13 @@ add_shopping_list_item:
       description: The item to add
       required: true
       example: Milk
+
+remove_shopping_list_item:
+  name: Remove Shopping List Item
+  description: Removes a shopping list item from the shopping list
+  fields:
+    item:
+      name: Item
+      description: The item to remove
+      required: true
+      example: Milk

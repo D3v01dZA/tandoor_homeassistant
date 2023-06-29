@@ -37,8 +37,30 @@ async def async_setup_entry(hass: core.HomeAssistant, entry: config_entries.Conf
                 _LOGGER.debug(f"Adding shopping list item response JSON {await response.json()}")
         await session.close()
 
+    async def remove_shopping_list_item(call: ServiceCall):
+        item = call.data["item"]
+        _LOGGER.debug(f"Removing shopping list item {item}")
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"{url}/api/shopping-list-entry/?checked=false", headers=headers(key)) as response:
+                _LOGGER.debug(f"Removing shopping list item {item} list items response {response}")
+                fetched_items = await response.json()
+                _LOGGER.debug(f"Removing shopping list item {item} list items response JSON {fetched_items}")
+            fetched_item = next((fetched_item for fetched_item in fetched_items if fetched_item["food"]["name"].lower() == item.lower()), None)
+            if fetched_item is None:
+                _LOGGER.info(f"Removing shopping list item {item} not found in shopping list")
+            else:
+                id = fetched_item["id"]
+                fetched_item["checked"] = True
+                _LOGGER.debug(f"Removing shopping list item {item} request body {fetched_item}")
+                async with session.put(f"{url}/api/shopping-list-entry/{id}", headers=headers(key), json=fetched_item) as response:
+                    _LOGGER.debug(f"Removing shopping list item {item} response {response}")
+                    fetched_items = await response.json()
+                    _LOGGER.debug(f"Removing shopping list item {item} response JSON {fetched_items}")
+        await session.close()
+
     _LOGGER.debug(f"Registering services for Tandoor {url}")
     hass.services.async_register(DOMAIN, "add_shopping_list_item", add_shopping_list_item, ADD_ITEM_SCHEMA)
+    hass.services.async_register(DOMAIN, "remove_shopping_list_item", remove_shopping_list_item, ADD_ITEM_SCHEMA)
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

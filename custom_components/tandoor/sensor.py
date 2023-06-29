@@ -55,7 +55,7 @@ class ShoppingList(Entity):
     def extra_state_attributes(self):
         """Return the state attributes"""
         attr = {}
-        attr["items"] = ",".join([item["food"]["name"] for item in self._items])
+        attr["items"] = ",".join([item["food"]["name"].lower() for item in self._items])
         return attr
     
     async def async_update(self):
