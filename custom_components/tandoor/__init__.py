@@ -11,6 +11,7 @@ from homeassistant import config_entries, core
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.exceptions import ConfigEntryNotReady
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -23,7 +24,15 @@ async def async_setup_entry(hass: core.HomeAssistant, entry: config_entries.Conf
     config = dict(entry.data)
     url = config["url"]
     key = config["key"]
-    _LOGGER.debug(f"Setting up Tandoor {url}")
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"{url}/api/shopping-list-entry/?checked=false", headers=headers(key)) as response:
+                _LOGGER.debug(f"Shopping list response {response}")
+                await response.json()
+        await session.close()
+    except Exception as ex:
+        raise ConfigEntryNotReady("Failed to connect") from ex
 
     hass.data[DOMAIN][entry.entry_id] = config
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
