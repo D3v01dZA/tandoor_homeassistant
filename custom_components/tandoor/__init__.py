@@ -53,6 +53,7 @@ async def async_setup_entry(hass: core.HomeAssistant, entry: config_entries.Conf
             async with session.get(f"{url}/api/shopping-list-entry/?checked=false", headers=headers(key)) as response:
                 _LOGGER.debug(f"Removing shopping list item {item} list items response {response}")
                 fetched_items = await response.json()
+                fetched_items = fetched_items["results"]
                 _LOGGER.debug(f"Removing shopping list item {item} list items response JSON {fetched_items}")
             fetched_item = next((fetched_item for fetched_item in fetched_items if fetched_item["food"]["name"].lower() == item.lower()), None)
             if fetched_item is None:
