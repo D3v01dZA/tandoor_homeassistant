@@ -66,7 +66,7 @@ class ShoppingList(Entity):
         async with aiohttp.ClientSession() as session:
             async with session.get(f"{self._url}/api/shopping-list-entry/?checked=false", headers=headers(self._key)) as response:
                 _LOGGER.debug(f"Shopping list response {response}")
-                items = await response.json()
+                items = await response.json()["results"]
                 _LOGGER.debug(f"Shopping list response JSON {items}")
                 items.sort(key=ordering)
                 self._items = items
