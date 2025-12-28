@@ -62,7 +62,7 @@ async def async_setup_entry(hass: core.HomeAssistant, entry: config_entries.Conf
                 id = fetched_item["id"]
                 fetched_item["checked"] = True
                 _LOGGER.debug(f"Removing shopping list item {item} request body {fetched_item}")
-                async with session.put(f"{url}/api/shopping-list-entry/{id}", headers=headers(key), json=fetched_item) as response:
+                async with session.put(f"{url}/api/shopping-list-entry/{id}/", headers=headers(key), json=fetched_item) as response:
                     _LOGGER.debug(f"Removing shopping list item {item} response {response}")
                     fetched_items = await response.json()
                     _LOGGER.debug(f"Removing shopping list item {item} response JSON {fetched_items}")
