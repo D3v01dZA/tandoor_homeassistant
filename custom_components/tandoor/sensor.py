@@ -64,10 +64,11 @@ class ShoppingList(Entity):
 
         _LOGGER.debug(f"Updating shopping list {self._url}")
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"{self._url}/api/shopping-list-entry/?checked=false", headers=headers(self._key)) as response:
+            async with session.get(f"{self._url}/api/shopping-list-entry/", headers=headers(self._key)) as response:
                 _LOGGER.debug(f"Shopping list response {response}")
                 items = await response.json()
                 items = items["results"]
+                items = [entry for entry in items if entry["checked"]]
                 _LOGGER.debug(f"Shopping list response JSON {items}")
                 items.sort(key=ordering)
                 self._items = items
