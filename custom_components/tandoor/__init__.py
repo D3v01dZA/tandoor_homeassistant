@@ -27,7 +27,7 @@ async def async_setup_entry(hass: core.HomeAssistant, entry: config_entries.Conf
 
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"{url}/api/shopping-list-entry/?checked=false", headers=headers(key)) as response:
+            async with session.get(f"{url}/api/shopping-list-entry/", headers=headers(key)) as response:
                 _LOGGER.debug(f"Shopping list response {response}")
                 await response.json()
         await session.close()
@@ -50,10 +50,11 @@ async def async_setup_entry(hass: core.HomeAssistant, entry: config_entries.Conf
         item = call.data["item"]
         _LOGGER.debug(f"Removing shopping list item {item}")
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"{url}/api/shopping-list-entry/?checked=false", headers=headers(key)) as response:
+            async with session.get(f"{url}/api/shopping-list-entry/", headers=headers(key)) as response:
                 _LOGGER.debug(f"Removing shopping list item {item} list items response {response}")
                 fetched_items = await response.json()
                 fetched_items = fetched_items["results"]
+                fetched_items = [entry for entry in fetched_items if entry["checked"]]
                 _LOGGER.debug(f"Removing shopping list item {item} list items response JSON {fetched_items}")
             fetched_item = next((fetched_item for fetched_item in fetched_items if fetched_item["food"]["name"].lower() == item.lower()), None)
             if fetched_item is None:
