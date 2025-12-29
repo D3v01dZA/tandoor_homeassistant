@@ -68,7 +68,7 @@ class ShoppingList(Entity):
                 _LOGGER.debug(f"Shopping list response {response}")
                 items = await response.json()
                 items = items["results"]
-                items = [entry for entry in items if entry["checked"]]
+                items = [entry for entry in items if not entry["checked"]]
                 _LOGGER.debug(f"Shopping list response JSON {items}")
                 items.sort(key=ordering)
                 self._items = items
