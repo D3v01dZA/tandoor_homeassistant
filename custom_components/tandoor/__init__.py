@@ -41,7 +41,7 @@ async def async_setup_entry(hass: core.HomeAssistant, entry: config_entries.Conf
         item = call.data["item"]
         _LOGGER.debug(f"Adding shopping list item {item}")
         async with aiohttp.ClientSession() as session:
-            async with session.post(f"{url}/api/shopping-list-entry/", headers=headers(key), json={"food": {"name": item}, "amount": ""}) as response:
+            async with session.post(f"{url}/api/shopping-list-entry/", headers=headers(key), json={"food": {"name": item}, "amount": "1"}) as response:
                 _LOGGER.debug(f"Adding shopping list item response {response}")
                 _LOGGER.debug(f"Adding shopping list item response JSON {await response.json()}")
         await session.close()
