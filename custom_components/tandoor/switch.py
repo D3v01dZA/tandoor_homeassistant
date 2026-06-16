@@ -34,6 +34,7 @@ class ShoppingListItemSwitch(CoordinatorEntity, SwitchEntity):
         self._url = url
         self._key = key
         self._item_name = item_name
+        self._optimistic_state: bool | None = None
         slug = slugify(item_name)
         self._attr_unique_id = f"{entry_id}-shopping-list-switch-{slug}"
         self._attr_name = item_name
@@ -41,13 +42,23 @@ class ShoppingListItemSwitch(CoordinatorEntity, SwitchEntity):
 
     @property
     def is_on(self) -> bool:
+        if self._optimistic_state is not None:
+            return self._optimistic_state
         items = self.coordinator.data or []
         return any(item["food"]["name"].lower() == self._item_name.lower() for item in items)
 
+    def _handle_coordinator_update(self) -> None:
+        self._optimistic_state = None
+        super()._handle_coordinator_update()
+
     async def async_turn_on(self, **kwargs) -> None:
         await add_item(self._url, self._key, self._item_name)
+        self._optimistic_state = True
+        self.async_write_ha_state()
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs) -> None:
         await remove_item(self._url, self._key, self._item_name)
+        self._optimistic_state = False
+        self.async_write_ha_state()
         await self.coordinator.async_request_refresh()

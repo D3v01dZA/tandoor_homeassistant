@@ -18,11 +18,18 @@
         }
     },
     "options": {
+        "error": {
+            "cannot_connect": "Failed to connect",
+            "invalid_auth": "Invalid authentication",
+            "unknown": "Unexpected error"
+        },
         "step": {
             "init": {
                 "title": "Tandoor options",
-                "description": "Configure shopping list item switches. Each name becomes a switch entity (switch.tandoor_<name>) that adds the item when turned on and removes it when turned off.",
+                "description": "Configure the connection and which items appear as switches. Each switch item becomes a switch entity that adds the item when turned on and removes it when turned off.",
                 "data": {
+                    "url": "URL",
+                    "key": "API Key",
                     "switch_items": "Shopping list switch items"
                 }
             }

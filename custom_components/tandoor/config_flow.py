@@ -61,25 +61,49 @@ class TandoorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 
 class TandoorOptionsFlow(config_entries.OptionsFlow):
-    """Options flow to manage shopping list item switches."""
+    """Options flow to manage URL, key, and shopping list item switches."""
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
+        entry = self.config_entry
+        errors: dict[str, str] = {}
 
-        current_items = self.config_entry.options.get(CONF_SWITCH_ITEMS, [])
+        if user_input is not None:
+            url = user_input["url"]
+            key = user_input["key"]
+            items = user_input.get(CONF_SWITCH_ITEMS, [])
+            try:
+                await validate_input({"url": url, "key": key})
+            except CannotConnect:
+                errors["base"] = "cannot_connect"
+            except aiohttp.client_exceptions.InvalidURL:
+                errors["base"] = "cannot_connect"
+            except Exception:
+                errors["base"] = "unknown"
+
+            if not errors:
+                self.hass.config_entries.async_update_entry(
+                    entry,
+                    data={"url": url, "key": key},
+                )
+                return self.async_create_entry(title="", data={CONF_SWITCH_ITEMS: items})
+
+        current_items = entry.options.get(CONF_SWITCH_ITEMS, [])
+        current_url = (user_input or {}).get("url", entry.data.get("url", ""))
+        current_key = (user_input or {}).get("key", entry.data.get("key", ""))
         schema = vol.Schema(
             {
+                vol.Required("url", default=current_url): str,
+                vol.Required("key", default=current_key): str,
                 vol.Optional(CONF_SWITCH_ITEMS, default=current_items): selector.SelectSelector(
                     selector.SelectSelectorConfig(
                         options=current_items,
                         multiple=True,
                         custom_value=True,
                     )
-                )
+                ),
             }
         )
-        return self.async_show_form(step_id="init", data_schema=schema)
+        return self.async_show_form(step_id="init", data_schema=schema, errors=errors)
 
 
 class CannotConnect(HomeAssistantError):
