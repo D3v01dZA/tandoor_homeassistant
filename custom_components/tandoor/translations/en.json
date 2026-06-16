@@ -16,5 +16,16 @@
                 }
             }
         }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Tandoor options",
+                "description": "Configure shopping list item switches. Each name becomes a switch entity (switch.tandoor_<name>) that adds the item when turned on and removes it when turned off.",
+                "data": {
+                    "switch_items": "Shopping list switch items"
+                }
+            }
+        }
     }
 }

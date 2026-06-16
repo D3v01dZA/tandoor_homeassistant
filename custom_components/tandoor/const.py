@@ -4,6 +4,8 @@ import voluptuous as vol
 
 DOMAIN = "tandoor"
 
+CONF_SWITCH_ITEMS = "switch_items"
+
 SCHEMA = vol.Schema(
     {
         vol.Required("url"): str,

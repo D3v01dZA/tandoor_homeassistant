@@ -2,14 +2,15 @@
 
 import logging
 
-from .const import SCHEMA
-from .const import DOMAIN
-from .const import headers
+from .const import CONF_SWITCH_ITEMS, DOMAIN, SCHEMA, headers
 
 import aiohttp
+import voluptuous as vol
 from homeassistant import config_entries
+from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import selector
 from typing import Any
 
 _LOGGER = logging.getLogger(__name__)
@@ -28,13 +29,13 @@ async def validate_input(user_input: dict[str, Any]) -> dict[str, Any]:
         await session.close()
 
 class TandoorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Config flow to set up whirlpool laundry"""
+    """Config flow to set up Tandoor"""
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the user step"""
         if user_input is None:
             return self.async_show_form(step_id="user", data_schema=SCHEMA)
-        
+
         errors = {}
 
         try:
@@ -52,7 +53,38 @@ class TandoorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors["base"] = "unknown"
 
         return self.async_show_form(step_id="user", data_schema=SCHEMA, errors=errors)
-    
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: config_entries.ConfigEntry) -> config_entries.OptionsFlow:
+        return TandoorOptionsFlow(config_entry)
+
+
+class TandoorOptionsFlow(config_entries.OptionsFlow):
+    """Options flow to manage shopping list item switches."""
+
+    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+        self.config_entry = config_entry
+
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        current_items = self.config_entry.options.get(CONF_SWITCH_ITEMS, [])
+        schema = vol.Schema(
+            {
+                vol.Optional(CONF_SWITCH_ITEMS, default=current_items): selector.SelectSelector(
+                    selector.SelectSelectorConfig(
+                        options=current_items,
+                        multiple=True,
+                        custom_value=True,
+                    )
+                )
+            }
+        )
+        return self.async_show_form(step_id="init", data_schema=schema)
+
+
 class CannotConnect(HomeAssistantError):
     """Error to indicate we cannot connect"""
 
