@@ -8,6 +8,7 @@ from .const import CONF_SWITCH_ITEMS, DOMAIN
 from homeassistant import config_entries
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify
@@ -39,6 +40,12 @@ class ShoppingListItemSwitch(CoordinatorEntity, SwitchEntity):
         self._attr_unique_id = f"{entry_id}-shopping-list-switch-{slug}"
         self._attr_name = item_name
         self.entity_id = f"switch.tandoor_{slug}"
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, entry_id)},
+            name="Tandoor",
+            manufacturer="Tandoor",
+            configuration_url=url,
+        )
 
     @property
     def is_on(self) -> bool:

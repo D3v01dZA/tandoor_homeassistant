@@ -6,6 +6,7 @@ from .const import DOMAIN
 
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -14,16 +15,22 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.ConfigEntry, async_add_entities: AddEntitiesCallback) -> None:
     data = hass.data[DOMAIN][config_entry.entry_id]
-    async_add_entities([ShoppingList(data["coordinator"], config_entry.entry_id)])
+    async_add_entities([ShoppingList(data["coordinator"], config_entry.entry_id, data["config"]["url"])])
 
 
 class ShoppingList(CoordinatorEntity):
     """The shopping list sensor"""
 
-    def __init__(self, coordinator, entry_id):
+    def __init__(self, coordinator, entry_id, url):
         super().__init__(coordinator)
         self._attr_unique_id = f"{entry_id}-shopping-list"
         self._attr_name = "Shopping List"
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, entry_id)},
+            name="Tandoor",
+            manufacturer="Tandoor",
+            configuration_url=url,
+        )
 
     @property
     def state(self) -> str:
