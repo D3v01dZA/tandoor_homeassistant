@@ -16,7 +16,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.SWITCH, Platform.TODO]
+PLATFORMS: list[Platform] = [Platform.SWITCH, Platform.TODO]
 SCAN_INTERVAL = timedelta(seconds=30)
 
 
