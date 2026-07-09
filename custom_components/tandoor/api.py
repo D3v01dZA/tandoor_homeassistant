@@ -44,3 +44,20 @@ async def remove_item(url: str, key: str, item: str) -> None:
         async with session.put(f"{url}/api/shopping-list-entry/{item_id}/", headers=headers(key), json=fetched_item) as response:
             _LOGGER.debug(f"Removing shopping list item {item} response {response}")
             _LOGGER.debug(f"Removing shopping list item {item} response JSON {await response.json()}")
+
+
+async def update_item(url: str, key: str, item_id, entry: dict) -> None:
+    """Update a shopping list entry with the given body."""
+    _LOGGER.debug(f"Updating shopping list item {item_id} request body {entry}")
+    async with aiohttp.ClientSession() as session:
+        async with session.put(f"{url}/api/shopping-list-entry/{item_id}/", headers=headers(key), json=entry) as response:
+            _LOGGER.debug(f"Updating shopping list item {item_id} response {response}")
+            _LOGGER.debug(f"Updating shopping list item {item_id} response JSON {await response.json()}")
+
+
+async def delete_item(url: str, key: str, item_id) -> None:
+    """Permanently delete a shopping list entry by id."""
+    _LOGGER.debug(f"Deleting shopping list item {item_id}")
+    async with aiohttp.ClientSession() as session:
+        async with session.delete(f"{url}/api/shopping-list-entry/{item_id}/", headers=headers(key)) as response:
+            _LOGGER.debug(f"Deleting shopping list item {item_id} response {response}")
