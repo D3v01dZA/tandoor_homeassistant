@@ -61,12 +61,6 @@ class TandoorShoppingListTodo(CoordinatorEntity, TodoListEntity):
             for entry in items
         ]
 
-    @property
-    def extra_state_attributes(self):
-        """Expose the item names as an attribute for templating."""
-        items = self.coordinator.data or []
-        return {"items": ",".join([entry["food"]["name"].lower() for entry in items])}
-
     async def async_create_todo_item(self, item: TodoItem) -> None:
         await add_item(self._url, self._key, item.summary)
         await self.coordinator.async_request_refresh()
